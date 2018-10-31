@@ -1,4 +1,4 @@
-# Random_Forrest
+# Random_Forest
 This Repository Contains Example Work with Random Forests
 
 The full report can be found in "REPORT_trees_and_Random_Forest_Example.pdf"
