@@ -133,7 +133,7 @@ Now we will run prediction with our final Model on the unknown data to see what 
 finalPredictions = predict(improve_rf,testSet)
 #write predictions to file
 write.table(finalPredictions,
-            "C:/Users/James Moore/Documents/Random_Forrest/predicted_O3_Values.txt",row.names = F)
+            "C:/Users/James Moore/Documents/Random_Forrest/predictionPoints/predicted_O3_Values.txt",row.names = F)
 ```
 
 Use these final prediction values to evaluate the accuracy of our model. For ease of use the values have been writen to a txt file and is attached with the homework submission.
