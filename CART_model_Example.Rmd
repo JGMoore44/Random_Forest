@@ -1,5 +1,5 @@
 ---
-title: "Trees and Random Forest HW5"
+title: "Trees and Random Forest Example"
 author: "Jimmy G. Moore"
 date: "April 9, 2018"
 output: html_document
@@ -15,8 +15,7 @@ To start we will upload the training dataset to our environment. The training da
 
 ```{r}
 #Import Training Set
-setwd("C:/2018_Spring/Stat_488/homework/hw5")
-trainingSet = read.csv("smogData_train.csv")
+trainingSet = read.csv("C:/Users/James Moore/Documents/Random_Forrest/dataFile/smogData_train.csv")
 trainingSet$X = NULL
 ```
 
@@ -72,7 +71,7 @@ Here we can see an reduction in overall MSE from 20.71 to 18.54, however, this i
 ## Abandon CART, focus on Random Forest
 We will now shift focus from a single CART Model to a random forest. Ensemble methods are generally better at producing a smaller prediciton variance and for that reason we would like to build one to predict `O3` for or data.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 set.seed(1234)
 library(randomForest)
 
@@ -87,10 +86,18 @@ MSE(performanceResult,test)
 This is a major improvement from our single tree model. Having said that, the previous random forest was a very basic model using many default values. Now we will make some adjustments to see if we can improve our predictions.
 
 ```{r}
+plot(forest,main = "MSE on Number of Trees in Forest")
+abline(v = 200, col="red", lwd=3, lty=2)
+varImpPlot(forest)
+```
+
+We can see that the error stabilizes around 200 trees in the model. For that reason we will include that in our final model.
+
+```{r}
 set.seed(1234)
 
 #improved random forest
-improve_rf = randomForest(O3~.,data = train, ntree = 925, importance=TRUE,
+improve_rf = randomForest(O3~.,data = train, ntree = 200, importance=TRUE,
                           mtry=2,
                           nodesize=3,
                           maxnodes = 100,
@@ -104,24 +111,29 @@ MSE(performanceResult,test)
 
 Here we can see that our imporved forest has a large drop in MSE (about 1). This is due primarily to changing the values of `mtry`, `nodesize`,`maxnodes`, `nPerm`, and controlling or correllation biases between predictor varialbes with `corr.bias = TRUE`. The performance is pretty good with this model. Unofrtunately, this random forest may be hard to interpret, as expected by the black box nature of these models, however, there is a significant difference in MSE between our single tree model and our random forest model. The individual trees in the random forest are much more complex than that of our single tree but we are more interested in prediction than we are interpretation so that is what we will run with. 
 
+```{r}
+varImpPlot(improve_rf)
+```
+
+We can also see from the above variable importance plot that `temp`, `ibt`, and `dpg` are the most important variables in our model. Notice these are different then observed in our full, untuned model
+
+
 ##Now we will apply our random forest to the prediction data and see how we did.
 
 Start by importing the prediction data
 ```{r}
 #Import prediciton data
 #Import Training Set
-setwd("C:/2018_Spring/Stat_488/homework/hw5")
-testSet = read.csv("smogDataPredict.csv")
+testSet = read.csv("C:/Users/James Moore/Documents/Random_Forrest/dataFile/smogDataPredict.csv")
 testSet$X = NULL
 ```
 
 Now we will run prediction with our final Model on the unknown data to see what we can expect
 ```{r}
 finalPredictions = predict(improve_rf,testSet)
-#print final predictions
-finalPredictions
 #write predictions to file
-write.table(finalPredictions, "predicted_O3_Values.txt",row.names = F)
+write.table(finalPredictions,
+            "C:/Users/James Moore/Documents/Random_Forrest/predicted_O3_Values.txt",row.names = F)
 ```
 
 Use these final prediction values to evaluate the accuracy of our model. For ease of use the values have been writen to a txt file and is attached with the homework submission.
